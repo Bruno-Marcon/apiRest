@@ -1,0 +1,19 @@
+
+### Requisição POST para criar um novo usuário ###
+POST http://localhost:3000/register
+Content-Type: application/json
+
+{
+  "username": "teste",
+  "password": "senha123"
+}
+
+### Requisição de login ###
+
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+  "username": "teste",
+  "password": "senha123"
+}
