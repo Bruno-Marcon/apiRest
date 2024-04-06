@@ -2,14 +2,12 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
-
+const e = require('express');
 dotenv.config();
 
-// Conectar ao db
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('./database.db');
 
-// Definir o modelo de usuário
 class User {
   static async register(username, password) {
     try {
@@ -27,24 +25,37 @@ class User {
     }
   }
 
-    static async login(username, password) {
-      try {
-        const db = await sqlite.open('./database.db');
-        const row = await db.get('SELECT * FROM users WHERE username = ?', [username]);
-        if (!row) {
-          throw new Error('Usuário não encontrado');
-        }
-        const isPasswordValid = await bcrypt.compare(password, row.password);
-        if (!isPasswordValid) {
-          throw new Error('Credenciais inválidas');
-        }
-        const token = jwt.sign({ username: row.username }, process.env.JWT_SECRET);
-        return token;
-      } catch (error) {
-        console.error('Erro ao fazer login:', error.message);
-        throw new Error('Erro ao fazer login');
-      }
-    }
+  static login(username, password) {
+    return new Promise((resolve, reject) => {
+        const query = 'SELECT * FROM users WHERE username = ?';
+        db.get(query, [username], async function(err, row) {
+            if (err) {
+                console.error('Erro ao fazer login:', err.message);
+                db.close();
+                reject(new Error('Erro ao fazer login'));
+                return;
+            }
+            console.log(row);
+            console.log(row.password)
+            if (!row) {
+                console.log('Usuário não encontrado');
+                reject(new Error('Usuário não encontrado'));
+                return;
+            }
+
+            const isPasswordValid = await bcrypt.compare(password, row.password);
+            if (!isPasswordValid) {
+                console.log('Credenciais inválidas');
+                reject(new Error('Credenciais inválidas'));
+                return;
+            }
+
+            const token = jwt.sign({ username: row.username }, process.env.JWT_SECRET);
+            console.log('Login bem-sucedido');
+            resolve(token);
+        });
+    });
+}
 
 
   static async getAllUsers() {

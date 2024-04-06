@@ -1,11 +1,8 @@
-// routes/authRoutes.js
 const express = require('express');
 const User = require('../models/user');
 
 const router = express.Router();
 
-
-// Rota para registro de usuário
 router.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -16,7 +13,6 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Rota para login de usuário
 router.post('/login', async (req, res) => {
     try {
       const { username, password } = req.body;
@@ -30,11 +26,11 @@ router.post('/login', async (req, res) => {
       res.status(500).json({ success: false, message: 'Erro ao fazer login' });
     }
   });
+
+
   
-// Endpoint para listar todos os usuários
 router.get('/users', async (req, res) => {
   try {
-    // Consultar todos os usuários no banco de dados
     const users = await User.getAllUsers();
     res.json(users);
   } catch (error) {
@@ -43,3 +39,4 @@ router.get('/users', async (req, res) => {
 });
 
 module.exports = router;
+
